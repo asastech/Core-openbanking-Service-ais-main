@@ -50,7 +50,7 @@
 		"make-promises-safe": "^5.1.0",
 		"openid-client": "^5.3.1",
 		"parse-redis-url-simple": "^1.0.2",
-		"pino": "^8.8.0",
+		"pino": "^8.11.0",
 		"pino-pretty": "^9.1.1",
 		"prisma-json-schema-generator": "^3.1.1",
 		"qs": "^6.11.0",
