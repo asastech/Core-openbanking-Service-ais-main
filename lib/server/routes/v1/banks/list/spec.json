@@ -1,0 +1,79 @@
+{
+	"schema": {
+		"tags": ["Banks"],
+		"description": "This route is used to get the list of banks.",
+		"summary": "Get the list of banks",
+		"response": {
+			"200": {
+				"description": "Successfully listed all banks",
+				"type": "object",
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"description": "Indicates the state of the performed operation. Could return `false` if the request succeeded, but failed while attempting to do other operations."
+					},
+					"message": {
+						"type": "string",
+						"description": "Returns some information on the state of the performed operation."
+					},
+					"data": {
+						"type": "object",
+						"properties": {
+							"banks": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"name": {
+											"type": "string"
+										},
+										"logoUrl": {
+											"type": "string",
+											"format": "uri"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"4xx": {
+				"description": "Failure due to bad input or auth.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Bad Request"
+					},
+					"message": {
+						"type": "string",
+						"default": "Invalid input, auth, parameters etc."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 400
+					}
+				}
+			},
+			"5xx": {
+				"description": "Failure on the service side.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Internal Server Error"
+					},
+					"message": {
+						"type": "string",
+						"default": "Something went wrong."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 500
+					}
+				}
+			}
+		}
+	}
+}

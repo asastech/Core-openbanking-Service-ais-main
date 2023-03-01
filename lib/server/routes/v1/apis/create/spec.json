@@ -1,0 +1,141 @@
+{
+	"schema": {
+		"tags": ["APIs"],
+		"description": "This route is used to create an API.",
+		"summary": "Create an API",
+		"headers": {
+			"type": "object",
+			"required": ["authorization"],
+			"properties": {
+				"authorization": {
+					"type": "string",
+					"pattern": "^(Bearer\\s)([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_\\-\\+/=]*)"
+				}
+			},
+			"errorMessage": {
+				"required": {
+					"authorization": "'authorization' header missing"
+				},
+				"properties": {
+					"authorization": "invalid format"
+				}
+			}
+		},
+		"body": {
+			"type": "object",
+			"required": ["name", "description", "version", "context", "visibility"],
+			"properties": {
+				"name": {
+					"type": "string",
+					"pattern": "^[a-zA-Z0-9._-]+$",
+					"minLength": 3,
+					"maxLength": 30
+				},
+				"description": {
+					"type": "string",
+					"minLength": 3,
+					"maxLength": 255
+				},
+				"version": {
+					"type": "string",
+					"pattern": "^[a-zA-Z0-9._-]+$",
+					"minLength": 3,
+					"maxLength": 30
+				},
+				"context": {
+					"type": "string",
+					"pattern": "^[a-zA-Z0-9._-]+$",
+					"minLength": 3,
+					"maxLength": 30
+				},
+				"visibility": {
+					"type": "string",
+					"enum": ["PUBLIC", "PRIVATE"]
+				},
+				"isEnabled": {
+					"type": "boolean",
+					"default": false
+				},
+				"isProtected": {
+					"type": "boolean",
+					"default": true
+				},
+				"subscriptionRequired": {
+					"type": "boolean",
+					"default": true
+				}
+			},
+			"errorMessage": {
+				"required": {
+					"name": "name is required",
+					"description": "description is required",
+					"version": "version is required",
+					"context": "context is required",
+					"visibility": "visibility is required"
+				},
+				"properties": {
+					"name": "must be a string and must contain only letters, numbers, underscores, periods and hyphens",
+					"description": "must be a string",
+					"version": "must be a string and must contain only letters, numbers, underscores, periods and hyphens",
+					"context": "must be a string and must contain only letters, numbers, underscores, periods and hyphens",
+					"visibility": "must be a string and must be one of the following: PUBLIC, PRIVATE",
+					"isEnabled": "must be a boolean",
+					"isProtected": "must be a boolean",
+					"subscriptionRequired": "must be a boolean"
+				}
+			}
+		},
+		"response": {
+			"200": {
+				"description": "Successful API creation response",
+				"type": "object",
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"description": "Indicates the state of the performed operation. Could return `false` if the request succeeded, but failed while attempting to do other operations."
+					},
+					"message": {
+						"type": "string",
+						"description": "Returns some information on the state of the performed operation."
+					}
+				}
+			},
+			"4xx": {
+				"description": "Failure due to bad input or auth.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Bad Request"
+					},
+					"message": {
+						"type": "string",
+						"default": "Invalid input, auth, parameters etc."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 400
+					}
+				}
+			},
+			"5xx": {
+				"description": "Failure on the service side.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Internal Server Error"
+					},
+					"message": {
+						"type": "string",
+						"default": "Something went wrong."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 500
+					}
+				}
+			}
+		}
+	}
+}

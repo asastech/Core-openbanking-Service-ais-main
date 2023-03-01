@@ -1,0 +1,223 @@
+{
+	"schema": {
+		"tags": ["Banks"],
+		"description": "This route is to be used to fetch a P2P Transfer.",
+		"summary": "Fetch a P2P Transfer",
+		"headers": {
+			"type": "object",
+			"required": ["authorization"],
+			"properties": {
+				"authorization": {
+					"type": "string",
+					"pattern": "^(Bearer\\s)([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_\\-\\+/=]*)"
+				}
+			},
+			"errorMessage": {
+				"required": {
+					"authorization": "'authorization' header missing"
+				},
+				"properties": {
+					"authorization": "invalid format"
+				}
+			}
+		},
+		"params": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["p2pTransferId"],
+			"properties": {
+				"p2pTransferId": {
+					"type": "string",
+					"format": "uuid"
+				}
+			},
+			"errorMessage": {
+				"type": "invalid payload: not in the desired format",
+				"required": {
+					"p2pTransferId": "'p2pTransferId' is required"
+				},
+				"properties": {
+					"p2pTransferId": "'p2pTransferId' must be a valid uuid"
+				},
+				"additionalProperties": "invalid payload: extra fields found"
+			}
+		},
+		"response": {
+			"200": {
+				"description": "Succssful P2P Transfer fetch response",
+				"type": "object",
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"description": "Indicates the state of the performed operation. Could return `false` if the request succeeded, but failed while attempting to do other operations."
+					},
+					"message": {
+						"type": "string",
+						"description": "Returns some information on the state of the performed operation."
+					},
+					"data": {
+						"type": "object",
+						"properties": {
+							"p2pTransfer": {
+								"type": "object",
+								"properties": {
+									"id": {
+										"type": "string",
+										"format": "uuid"
+									},
+									"senderBankAccountId": {
+										"type": "string",
+										"format": "uuid"
+									},
+									"receiverBankAccountId": {
+										"type": "string",
+										"format": "uuid"
+									},
+									"amount": {
+										"type": "number",
+										"format": "double"
+									},
+									"initiatedDate": {
+										"type": "string",
+										"format": "date-time"
+									},
+									"completedDate": {
+										"type": "string",
+										"format": "date-time"
+									},
+									"status": {
+										"type": "string",
+										"enum": ["PENDING", "COMPLETED", "FAILED"]
+									},
+									"reason": {
+										"type": "string"
+									},
+									"type": {
+										"type": "string",
+										"enum": ["PAYMENT", "REFUND", "REVERSAL"]
+									},
+									"senderBankAccount": {
+										"type": "object",
+										"properties": {
+											"id": {
+												"type": "string",
+												"format": "uuid"
+											},
+											"bankId": {
+												"type": "string",
+												"format": "uuid"
+											},
+											"ssn": {
+												"type": "string"
+											},
+											"balance": {
+												"type": "number",
+												"format": "double"
+											},
+											"lastWithdrawal": {
+												"type": "string",
+												"format": "date-time"
+											},
+											"lastDeposit": {
+												"type": "string",
+												"format": "date-time"
+											},
+											"createdAt": {
+												"type": "string",
+												"format": "date-time"
+											},
+											"updatedAt": {
+												"type": "string",
+												"format": "date-time"
+											}
+										}
+									},
+									"recieverBankAccount": {
+										"type": "object",
+										"properties": {
+											"id": {
+												"type": "string",
+												"format": "uuid"
+											},
+											"bankId": {
+												"type": "string",
+												"format": "uuid"
+											},
+											"ssn": {
+												"type": "string"
+											},
+											"balance": {
+												"type": "number",
+												"format": "double"
+											},
+											"lastWithdrawal": {
+												"type": "string",
+												"format": "date-time"
+											},
+											"lastDeposit": {
+												"type": "string",
+												"format": "date-time"
+											},
+											"createdAt": {
+												"type": "string",
+												"format": "date-time"
+											},
+											"updatedAt": {
+												"type": "string",
+												"format": "date-time"
+											}
+										}
+									},
+									"createdAt": {
+										"type": "string",
+										"format": "date-time"
+									},
+									"updatedAt": {
+										"type": "string",
+										"format": "date-time"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"4xx": {
+				"description": "Failure due to bad input or auth.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Bad Request"
+					},
+					"message": {
+						"type": "string",
+						"default": "Invalid input, auth, parameters etc."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 400
+					}
+				}
+			},
+			"5xx": {
+				"description": "Failure on the service side.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Internal Server Error"
+					},
+					"message": {
+						"type": "string",
+						"default": "Something went wrong."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 500
+					}
+				}
+			}
+		}
+	}
+}

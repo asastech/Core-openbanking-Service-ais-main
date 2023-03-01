@@ -1,0 +1,104 @@
+{
+	"schema": {
+		"description": "This route is to be used when an Application must be created. Applications are abstract resources that have a single Client resource in the Keycloak server.",
+		"summary": "Creates an Application Resource by an Account ID from an Access Token.",
+		"tags": ["Applications"],
+		"headers": {
+			"type": "object",
+			"required": ["authorization"],
+			"properties": {
+				"authorization": {
+					"type": "string",
+					"pattern": "^(Bearer\\s)([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_\\-\\+/=]*)"
+				}
+			},
+			"errorMessage": {
+				"required": {
+					"authorization": "'authorization' header missing"
+				},
+				"properties": {
+					"authorization": "invalid format"
+				}
+			}
+		},
+		"body": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["name", "baseUrl"],
+			"properties": {
+				"name": {
+					"type": "string",
+					"pattern": "\\w+"
+				},
+				"baseUrl": {
+					"type": "string",
+					"format": "uri"
+				}
+			},
+			"errorMessage": {
+				"type": "invalid payload: not in the desired format",
+				"required": {
+					"name": "'name' is a required property",
+					"baseUrl": "'baseUrl' is a required property"
+				},
+				"properties": {
+					"name": "invalid format",
+					"baseUrl": "invalid format: must be a valid URL"
+				},
+				"additionalProperties": "invalid payload: extra fields found"
+			}
+		},
+		"response": {
+			"200": {
+				"description": "Successful Application Create response.",
+				"type": "object",
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"description": "Indicates the state of the performed operation. Could return `false` if the request succeeded, but failed while attempting to do other operations."
+					},
+					"message": {
+						"type": "string",
+						"description": "Returns some information on the state of the performed operation."
+					}
+				}
+			},
+			"4xx": {
+				"description": "Failure due to bad input or auth.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Bad Request"
+					},
+					"message": {
+						"type": "string",
+						"default": "Invalid input, auth, parameters etc."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 400
+					}
+				}
+			},
+			"5xx": {
+				"description": "Failure on the service side.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Internal Server Error"
+					},
+					"message": {
+						"type": "string",
+						"default": "Something went wrong."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 500
+					}
+				}
+			}
+		}
+	}
+}

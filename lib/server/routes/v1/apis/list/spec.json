@@ -1,0 +1,109 @@
+{
+	"schema": {
+		"tags": ["APIs"],
+		"description": "This route is to be used to list all APIs.",
+		"summary": "List all APIs",
+		"response": {
+			"200": {
+				"description": "Successful List APIs response",
+				"type": "object",
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"description": "Indicates the state of the performed operation. Could return `false` if the request succeeded, but failed while attempting to do other operations."
+					},
+					"message": {
+						"type": "string",
+						"description": "Returns some information on the state of the performed operation."
+					},
+					"data": {
+						"type": "object",
+						"properties": {
+							"apis": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "string",
+											"format": "uuid"
+										},
+										"name": {
+											"type": "string"
+										},
+										"description": {
+											"type": "string"
+										},
+										"version": {
+											"type": "string"
+										},
+										"context": {
+											"type": "string"
+										},
+										"visibility": {
+											"type": "string",
+											"enum": ["PUBLIC", "PRIVATE"]
+										},
+										"isEnabled": {
+											"type": "boolean"
+										},
+										"isProtected": {
+											"type": "boolean"
+										},
+										"subscriptionRequired": {
+											"type": "boolean"
+										},
+										"createdAt": {
+											"type": "string",
+											"format": "date-time"
+										},
+										"updatedAt": {
+											"type": "string",
+											"format": "date-time"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"4xx": {
+				"description": "Failure due to bad input or auth.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Bad Request"
+					},
+					"message": {
+						"type": "string",
+						"default": "Invalid input, auth, parameters etc."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 400
+					}
+				}
+			},
+			"5xx": {
+				"description": "Failure on the service side.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Internal Server Error"
+					},
+					"message": {
+						"type": "string",
+						"default": "Something went wrong."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 500
+					}
+				}
+			}
+		}
+	}
+}

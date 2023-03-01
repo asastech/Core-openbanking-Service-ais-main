@@ -1,0 +1,104 @@
+{
+	"schema": {
+		"tags": ["Banks"],
+		"description": "This route is to be used to create a Transaction to deposit money into a user's bank account.",
+		"summary": "Deposit money into a bank account",
+		"headers": {
+			"type": "object",
+			"required": ["authorization"],
+			"properties": {
+				"authorization": {
+					"type": "string",
+					"pattern": "^(Bearer\\s)([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_\\-\\+/=]*)"
+				}
+			},
+			"errorMessage": {
+				"required": {
+					"authorization": "'authorization' header missing"
+				},
+				"properties": {
+					"authorization": "invalid format"
+				}
+			}
+		},
+		"body": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["bankAccountId", "amount"],
+			"properties": {
+				"bankAccountId": {
+					"type": "string",
+					"format": "uuid"
+				},
+				"amount": {
+					"type": "number",
+					"minimum": 0
+				}
+			},
+			"errorMessage": {
+				"type": "invalid payload: not in the desired format",
+				"required": {
+					"bankAccountId": "'bankAccountId' is required",
+					"amount": "'amount' is required"
+				},
+				"properties": {
+					"bankAccountId": "'bankAccountId' must be a valid UUID",
+					"amount": "'amount' must be a positive number"
+				},
+				"additionalPropertise": "invalid payload: extra fields found"
+			}
+		},
+		"response": {
+			"200": {
+				"description": "Successfully created a Transaction to deposit money into a user's bank account",
+				"type": "object",
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"description": "Indicates the state of the performed operation. Could return `false` if the request succeeded, but failed while attempting to do other operations."
+					},
+					"message": {
+						"type": "string",
+						"description": "Returns some information on the state of the performed operation."
+					}
+				}
+			},
+			"4xx": {
+				"description": "Failure due to bad input or auth.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Bad Request"
+					},
+					"message": {
+						"type": "string",
+						"default": "Invalid input, auth, parameters etc."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 400
+					}
+				}
+			},
+			"5xx": {
+				"description": "Failure on the service side.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Internal Server Error"
+					},
+					"message": {
+						"type": "string",
+						"default": "Something went wrong."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 500
+					}
+				}
+			}
+		}
+	}
+}

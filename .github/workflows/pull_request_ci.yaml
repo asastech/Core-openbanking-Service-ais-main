@@ -1,0 +1,77 @@
+name: 'Pull Request CI'
+on:
+  pull_request:
+    branches:
+      - main
+      - staging
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x]
+      fail-fast: true
+    env:
+      GHCR_PAT: ${{ secrets.GHCR_PAT }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v1
+      - name: Docker Login
+        run: echo $GHCR_PAT | docker login ghcr.io -u phr3nzy --password-stdin
+        env:
+          GHCR_PAT: ${{ secrets.GHCR_PAT }}
+      - name: Start containers
+        run: docker-compose -f "docker-compose.yml" up -d --build
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2.2.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Lint
+        run: yarn lint
+      - name: Build
+        run: yarn build:esbuild
+      - name: Wait for Keycloak and Vault
+        run: chmod -x ./wait-for-kc.sh && chmod -x ./wait-for-vault.sh && sh ./wait-for-kc.sh && sh ./wait-for-vault.sh
+      - name: Run tests
+        run: yarn test:ci
+        env:
+          SERVICE_NAME: api-testing
+          NODE_ENV: testing
+          APP_ENV: testing
+          LOG_LEVEL: debug
+          DISABLE_LOGGING: false
+          HOST: 0.0.0.0
+          PORT: 3000
+          DATABASE_URL: postgres://postgres:password123@localhost:5432/api
+          CACHE_URL: redis://localhost:6379/
+          KEYCLOAK_URL: http://localhost:8080
+          KEYCLOAK_REALM: fapi
+          KEYCLOAK_FAPI_REALM: fapi
+          KEYCLOAK_FAPI_USER_ROLE: fapi-user
+          KEYCLOAK_FAPI_CLIENT_ROLE: fapi-client
+          KEYCLOAK_CLIENT_ID: hulk
+          KEYCLOAK_CLIENT_SECRET: super_secret_hulk_client_secret
+          PASSWORD_HASHING_SECRET: super_secret_password_hashing_secret
+          CLIENT_SECRET_HASHING_SECRET: super_secret_client_secret_hashing_secret
+          VAULT_ADDR: http://localhost:8200
+          VAULT_TOKEN: super_secret_vault_token
+          PKI_MOUNT_NAME: testing-pki-mount-name
+          PKI_ROLE_NAME: testing-role-name
+          PKI_ISSUER_REF: ofin-dev
+          PKI_CERT_EXPIRATION: 876600h
+      - name: Stop containers
+        if: always()
+        run: docker-compose -f "docker-compose.yml" down
+  build_image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v1
+      - uses: docker/build-push-action@v2
+        with:
+          context: .
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

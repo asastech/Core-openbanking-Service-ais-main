@@ -1,0 +1,115 @@
+{
+	"schema": {
+		"description": "This route is used to create a Bank Account.",
+		"summary": "Creates a Bank Account",
+		"tags": ["Banks"],
+		"headers": {
+			"type": "object",
+			"required": ["authorization"],
+			"properties": {
+				"authorization": {
+					"type": "string",
+					"pattern": "^(Bearer\\s)([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_\\-\\+/=]*)"
+				}
+			},
+			"errorMessage": {
+				"required": {
+					"authorization": "'authorization' header missing"
+				},
+				"properties": {
+					"authorization": "invalid format"
+				}
+			}
+		},
+		"body": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["bankId", "accountName", "ssn"],
+			"properties": {
+				"accountName": {
+					"type": "string",
+					"description": "The AccountName of the Bank Account to fetch.",
+					"pattern": "^[a-zA-Z0-9\\-\\_]{1,}$",
+					"minLength": 1,
+					"maxLength": 50
+				},
+				"bankName": {
+					"type": "string",
+					"description": "The BankName of the Bank Account to fetch.",
+					"pattern": "^[a-zA-Z0-9\\-\\_]{1,}$",
+					"minLength": 1,
+					"maxLength": 50
+				},
+				"ssn": {
+					"type": "string",
+					"description": "The Social Security Number of the Bank Account to fetch.",
+					"pattern": "^[0-9]{3}-[0-9]{2}-[0-9]{4}$"
+				}
+			},
+			"errorMessage": {
+				"type": "invalid payload: not in the desired format",
+				"properties": {
+					"bankId": "invalid format: must be a valid UUID",
+					"accountName": "invalid format: must be a string with only letters, dashes and underscores"
+				},
+				"required": {
+					"bankId": "'bankId' is required",
+					"accountName": "'accountName' is required"
+				},
+				"additionalProperties": "invalid payload: extra fields found"
+			}
+		},
+		"response": {
+			"200": {
+				"description": "Successful Bank Account create response",
+				"type": "object",
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"description": "Indicates the state of the performed operation. Could return `false` if the request succeeded, but failed while attempting to do other operations."
+					},
+					"message": {
+						"type": "string",
+						"description": "Returns some information on the state of the performed operation."
+					}
+				}
+			},
+			"4xx": {
+				"description": "Failure due to bad input or auth.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Bad Request"
+					},
+					"message": {
+						"type": "string",
+						"default": "Invalid input, auth, parameters etc."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 400
+					}
+				}
+			},
+			"5xx": {
+				"description": "Failure on the service side.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Internal Server Error"
+					},
+					"message": {
+						"type": "string",
+						"default": "Something went wrong."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 500
+					}
+				}
+			}
+		}
+	}
+}

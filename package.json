@@ -1,0 +1,116 @@
+{
+	"name": "api",
+	"version": "1.0.0",
+	"description": "OFIN API",
+	"main": "index.js",
+	"repository": "git@github.com:oofin-engineering/api.git",
+	"author": "phr3nzy <adilosama47@gmail.com>",
+	"license": "SEE LICENSE IN LICENSE.md",
+	"private": true,
+	"scripts": {
+		"build": "tsc",
+		"build:esbuild": "etsc --config=etsc.config.js",
+		"start": "node dist",
+		"dev": "tsc-watch --onSuccess 'node dist/index.js'",
+		"test": "jest --no-cache --verbose --runInBand --detectOpenHandles --forceExit",
+		"test:ci": "jest --ci --no-cache --verbose --runInBand --detectOpenHandles --forceExit",
+		"lint": "eslint --ext .ts,.js . --ignore-path .gitignore",
+		"fix": "eslint --ext .ts,.js . --ignore-path .gitignore --fix",
+		"lint-staged": "lint-staged",
+		"postinstall": "yarn husky install; yarn prisma:generate",
+		"prisma:deploy": "prisma deploy",
+		"prisma:generate": "prisma generate"
+	},
+	"dependencies": {
+		"@fastify/cors": "^8.2.0",
+		"@fastify/env": "^4.2.0",
+		"@fastify/helmet": "^10.1.0",
+		"@fastify/request-context": "^4.2.0",
+		"@fastify/sensible": "^5.2.0",
+		"@fastify/swagger": "^8.2.1",
+		"@fastify/swagger-ui": "^1.3.0",
+		"@fastify/under-pressure": "^8.2.0",
+		"@keycloak/keycloak-admin-client": "^18.0.2",
+		"@prisma/client": "^4.8.1",
+		"ajv": "^8.12.0",
+		"ajv-errors": "^3.0.0",
+		"ajv-formats": "^2.1.1",
+		"argon2": "^0.30.3",
+		"axios": "^1.2.2",
+		"crypto-random-string": "<4",
+		"env-cmd": "^10.1.0",
+		"fastify": "^4.11.0",
+		"fastify-cron": "^1.3.1",
+		"fastify-plugin": "^4.5.0",
+		"fluent-json-schema": "^4.0.0",
+		"ioredis": "^5.2.5",
+		"jsonwebtoken": "^9.0.0",
+		"jwk-to-pem": "^2.0.5",
+		"jwks-rsa": "^3.0.1",
+		"make-promises-safe": "^5.1.0",
+		"openid-client": "^5.3.1",
+		"parse-redis-url-simple": "^1.0.2",
+		"pino": "^8.8.0",
+		"pino-pretty": "^9.1.1",
+		"prisma-json-schema-generator": "^3.1.1",
+		"qs": "^6.11.0",
+		"uuid": "^9.0.0"
+	},
+	"devDependencies": {
+		"@types/ioredis": "^5.0.0",
+		"@types/jest": "^29.2.5",
+		"@types/jsonwebtoken": "^9.0.1",
+		"@types/jwk-to-pem": "^2.0.1",
+		"@types/node": "^18.11.18",
+		"@types/qs": "^6.9.7",
+		"@types/uuid": "^9.0.0",
+		"@typescript-eslint/eslint-plugin": "^5.48.1",
+		"@typescript-eslint/parser": "^5.48.1",
+		"cpy": "^9.0.1",
+		"esbuild": "^0.17.0",
+		"esbuild-node-tsc": "^2.0.5",
+		"eslint": "^8.32.0",
+		"eslint-config-prettier": "^8.6.0",
+		"eslint-plugin-prettier": "^4.2.1",
+		"eslint-plugin-security": "^1.6.0",
+		"husky": "^8.0.3",
+		"jest": "^29.3.1",
+		"lint-staged": "^13.1.0",
+		"prettier": "^2.8.3",
+		"prisma": "^4.8.1",
+		"rimraf": "^4.0.7",
+		"ts-jest": "^29.0.5",
+		"ts-node": "^10.9.1",
+		"tsc-watch": "^6.0.0",
+		"typescript": "^4.9.4"
+	},
+	"lint-staged": {
+		"*.{js,ts,json,md,yml,yaml}": [
+			"prettier --write"
+		]
+	},
+	"jest": {
+		"verbose": true,
+		"preset": "ts-jest",
+		"testEnvironment": "node",
+		"testPathIgnorePatterns": [
+			"node_modules",
+			"tests/config/*"
+		],
+		"transform": {
+			"^.+\\.tsx?$": "ts-jest"
+		},
+		"testRegex": [
+			"/tests?/[a-zA-Z0-9]{0,}\\.(test|spec)\\.(js|ts)[\\s]?",
+			"/tests?/.*/[a-zA-Z0-9]{0,}\\.(test|spec)\\.(js|ts)[\\s]?"
+		],
+		"moduleFileExtensions": [
+			"ts",
+			"tsx",
+			"js",
+			"jsx",
+			"json",
+			"node"
+		]
+	}
+}

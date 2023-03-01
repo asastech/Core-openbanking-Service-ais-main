@@ -1,0 +1,112 @@
+{
+	"schema": {
+		"tags": ["Banks"],
+		"description": "This route is to be used to initiate a P2P Transfer.",
+		"summary": "Initiate a P2P Transfer",
+		"headers": {
+			"type": "object",
+			"required": ["authorization"],
+			"properties": {
+				"authorization": {
+					"type": "string",
+					"pattern": "^(Bearer\\s)([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_\\-\\+/=]*)"
+				}
+			},
+			"errorMessage": {
+				"required": {
+					"authorization": "'authorization' header missing"
+				},
+				"properties": {
+					"authorization": "invalid format"
+				}
+			}
+		},
+		"body": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["senderBankAccountId", "recieverBankAccountId", "amount"],
+			"properties": {
+				"senderBankAccountId": {
+					"type": "string",
+					"format": "uuid"
+				},
+				"recieverBankAccountId": {
+					"type": "string",
+					"format": "uuid"
+				},
+				"amount": {
+					"type": "number",
+					"minimum": 0
+				}
+			},
+			"errorMessage": {
+				"type": "invalid payload: not in the desired format",
+				"required": {
+					"senderBankAccountId": "'senderBankAccountId' is required",
+					"recieverBankAccountId": "'recieverBankAccountId' is required",
+					"amount": "'amount' is required",
+					"description": "'description' is required"
+				},
+				"properties": {
+					"senderBankAccountId": "'senderBankAccountId' must be a uuid",
+					"recieverBankAccountId": "'recieverBankAccountId' must be a uuid",
+					"amount": "'amount' must be a number and greater than 0",
+					"description": "'description' must be a string and between 1 and 100 characters"
+				},
+				"additionalProperties": "invalid payload: extra fields found"
+			}
+		},
+		"response": {
+			"200": {
+				"description": "Successfully initiated a P2P Transfer",
+				"type": "object",
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"description": "Indicates the state of the performed operation. Could return `false` if the request succeeded, but failed while attempting to do other operations."
+					},
+					"message": {
+						"type": "string",
+						"description": "Returns some information on the state of the performed operation."
+					}
+				}
+			},
+			"4xx": {
+				"description": "Failure due to bad input or auth.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Bad Request"
+					},
+					"message": {
+						"type": "string",
+						"default": "Invalid input, auth, parameters etc."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 400
+					}
+				}
+			},
+			"5xx": {
+				"description": "Failure on the service side.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Internal Server Error"
+					},
+					"message": {
+						"type": "string",
+						"default": "Something went wrong."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 500
+					}
+				}
+			}
+		}
+	}
+}

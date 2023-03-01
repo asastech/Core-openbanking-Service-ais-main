@@ -1,0 +1,279 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator jsonSchema {
+  provider                 = "prisma-json-schema-generator"
+  output                   = "../lib/server/config"
+  includeRequiredFields    = "true"
+  keepRelationScalarFields = "true"
+  persistOriginalType      = "true"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id             String             @id @db.Uuid
+  username       String             @unique @db.VarChar
+  email          String             @unique @db.VarChar
+  passwordHash   String
+  status         accountstatus      @default(UNVERIFIED)
+  deletedBy      accountdeletedby?
+  deletedById    String?            @db.Uuid
+  createdAt      DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime           @default(now()) @db.Timestamptz(6)
+  deletedAt      DateTime?          @db.Timestamptz(6)
+  apiConfigs     AccountApiConfig[]
+  apiUsages      AccountApiUsage[]
+  applications   Application[]
+  certificates   Certificate[]
+  companyDetails CompanyDetails[]
+}
+
+model AccountApiConfig {
+  id        String   @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  apiId     String   @db.Uuid
+  accountId String   @db.Uuid
+  isEnabled Boolean  @default(false)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @db.Timestamptz(6)
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  api       Api      @relation(fields: [apiId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model AccountApiUsage {
+  id        String   @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  apiId     String   @db.Uuid
+  accountId String   @db.Uuid
+  month     DateTime @db.Date
+  count     Int      @default(0)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @db.Timestamptz(6)
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  api       Api      @relation(fields: [apiId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Api {
+  id                   String             @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  name                 String             @db.VarChar
+  description          String
+  version              String             @db.VarChar
+  context              String             @db.VarChar
+  visibility           String             @default("PUBLIC") @db.VarChar
+  isEnabled            Boolean            @default(false)
+  isProtected          Boolean            @default(false)
+  subscriptionRequired Boolean            @default(false)
+  createdAt            DateTime           @default(now()) @db.Timestamp(6)
+  updatedAt            DateTime           @default(now()) @db.Timestamp(6)
+  apiConfigs           AccountApiConfig[]
+  apiUsages            AccountApiUsage[]
+}
+
+model Application {
+  id          String                @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  accountId   String                @db.Uuid
+  name        String                @db.VarChar
+  status      applicationstatus     @default(ACTIVE)
+  deletedBy   applicationdeletedby?
+  deletedById String?               @db.Uuid
+  createdAt   DateTime              @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime              @default(now()) @db.Timestamptz(6)
+  deletedAt   DateTime?             @db.Timestamptz(6)
+  accounts    Account               @relation(fields: [accountId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  client      Client[]
+
+  @@unique([accountId, name])
+}
+
+model Bank {
+  id           String        @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  name         String        @unique @db.VarChar
+  logoUrl      String        @db.VarChar
+  createdAt    DateTime      @default(now()) @db.Timestamptz(6)
+  bankAccounts BankAccount[]
+}
+
+model BankAccount {
+  id                   String         @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  bankId               String         @db.Uuid
+  accountName          String         @db.VarChar
+  ssn                  String         @db.VarChar
+  balance              Decimal        @default(0) @db.Decimal(10, 2)
+  createdAt            DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime       @default(now()) @db.Timestamptz(6)
+  lastWithdrawal       DateTime?      @db.Timestamptz(6)
+  lastDeposit          DateTime?      @db.Timestamptz(6)
+  bank                 Bank           @relation(fields: [bankId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  notifications        Notification[]
+  receivedP2pTransfers P2pTransfer[]  @relation("receiver")
+  sentP2pTransfers     P2pTransfer[]  @relation("sender")
+  transactions         Transaction[]
+
+  @@unique([accountName, ssn, bankId], map: "bank_account_account_name_ssn_bank_id_key")
+}
+
+model Certificate {
+  id           String                @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  accountId    String                @db.Uuid
+  description  String
+  commonName   String                @db.VarChar
+  serialNumber String                @db.VarChar
+  status       certificatestatus     @default(ISSUED)
+  deletedBy    certificatedeletedby?
+  deletedById  String?               @db.Uuid
+  expiresAt    DateTime              @db.Timestamptz(6)
+  createdAt    DateTime              @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime              @default(now()) @db.Timestamptz(6)
+  deletedAt    DateTime?             @db.Timestamptz(6)
+  account      Account               @relation(fields: [accountId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([accountId, commonName])
+}
+
+model Client {
+  id            String           @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  applicationId String           @db.Uuid
+  name          String           @db.Uuid
+  baseUrl       String           @db.VarChar
+  type          clienttype
+  secret        String
+  status        clientstatus     @default(CREATED)
+  deletedBy     clientdeletedby?
+  deletedById   String?          @db.Uuid
+  createdAt     DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime         @default(now()) @db.Timestamptz(6)
+  deletedAt     DateTime?        @db.Timestamptz(6)
+  application   Application      @relation(fields: [applicationId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([name, secret])
+}
+
+model CompanyDetails {
+  id        String   @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  accountId String   @db.Uuid
+  details   Json
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @db.Timestamptz(6)
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([details], type: Gin)
+}
+
+model Notification {
+  id            String      @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  bankAccountId String      @db.Uuid
+  message       String
+  details       Json?
+  createdAt     DateTime    @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime    @default(now()) @db.Timestamptz(6)
+  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model P2pTransfer {
+  id                    String            @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  senderBankAccountId   String            @db.Uuid
+  receiverBankAccountId String            @db.Uuid
+  amount                Decimal           @db.Decimal(10, 2)
+  initiatedDate         DateTime          @db.Timestamptz(6)
+  completedDate         DateTime?         @db.Timestamptz(6)
+  status                p2ptransferstatus
+  reason                String?
+  type                  p2ptransfertype
+  createdAt             DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime          @default(now()) @db.Timestamptz(6)
+  recieverBankAccount   BankAccount       @relation("receiver", fields: [receiverBankAccountId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  senderBankAccount     BankAccount       @relation("sender", fields: [senderBankAccountId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Transaction {
+  id            String            @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  bankAccountId String            @db.Uuid
+  amount        Decimal           @default(0) @db.Decimal(10, 2)
+  isWithdrawal  Boolean           @default(false)
+  isDeposit     Boolean           @default(false)
+  status        transactionstatus @default(PENDING)
+  createdAt     DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime          @default(now()) @db.Timestamptz(6)
+  bankAccount   BankAccount       @relation(fields: [bankAccountId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum accountdeletedby {
+  USER
+  SYSTEM
+  ADMIN
+}
+
+enum accountstatus {
+  UNVERIFIED
+  VERIFIED
+  BANNED
+  DELETED
+}
+
+enum apivisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum applicationdeletedby {
+  USER
+  SYSTEM
+  ADMIN
+}
+
+enum applicationstatus {
+  ACTIVE
+  INACTIVE
+  DELETED
+}
+
+enum certificatedeletedby {
+  USER
+  SYSTEM
+  ADMIN
+}
+
+enum certificatestatus {
+  ISSUED
+  REVOKED
+  EXPIRED
+  DELETED
+}
+
+enum clientdeletedby {
+  USER
+  SYSTEM
+  ADMIN
+}
+
+enum clientstatus {
+  CREATED
+  DISABLED
+  DELETED
+}
+
+enum clienttype {
+  PUBLIC
+  CONFIDENTIAL
+}
+
+enum p2ptransferstatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum p2ptransfertype {
+  PAYMENT
+  REFUND
+  REVERSAL
+}
+
+enum transactionstatus {
+  PENDING
+  SUCCESS
+  FAILED
+}

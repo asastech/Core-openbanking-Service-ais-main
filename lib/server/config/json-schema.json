@@ -1,0 +1,770 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"definitions": {
+		"Account": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"username": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"email": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"passwordHash": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"status": {
+					"type": "string",
+					"originalType": "accountstatus",
+					"default": "UNVERIFIED",
+					"enum": ["UNVERIFIED", "VERIFIED", "BANNED", "DELETED"]
+				},
+				"deletedBy": {
+					"type": ["string", "null"],
+					"originalType": "accountdeletedby",
+					"enum": ["USER", "SYSTEM", "ADMIN"]
+				},
+				"deletedById": {
+					"type": ["string", "null"],
+					"originalType": "String"
+				},
+				"createdAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"deletedAt": {
+					"type": ["string", "null"],
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"apiConfigs": {
+					"type": "array",
+					"originalType": "AccountApiConfig",
+					"items": {
+						"$ref": "#/definitions/AccountApiConfig"
+					}
+				},
+				"apiUsages": {
+					"type": "array",
+					"originalType": "AccountApiUsage",
+					"items": {
+						"$ref": "#/definitions/AccountApiUsage"
+					}
+				},
+				"applications": {
+					"type": "array",
+					"originalType": "Application",
+					"items": {
+						"$ref": "#/definitions/Application"
+					}
+				},
+				"certificates": {
+					"type": "array",
+					"originalType": "Certificate",
+					"items": {
+						"$ref": "#/definitions/Certificate"
+					}
+				},
+				"companyDetails": {
+					"type": "array",
+					"originalType": "CompanyDetails",
+					"items": {
+						"$ref": "#/definitions/CompanyDetails"
+					}
+				}
+			},
+			"required": ["id", "username", "email", "passwordHash"]
+		},
+		"AccountApiConfig": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"apiId": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"accountId": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"isEnabled": {
+					"type": "boolean",
+					"originalType": "Boolean",
+					"default": false
+				},
+				"createdAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"account": {
+					"$ref": "#/definitions/Account"
+				},
+				"api": {
+					"$ref": "#/definitions/Api"
+				}
+			},
+			"required": ["apiId", "accountId"]
+		},
+		"AccountApiUsage": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"apiId": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"accountId": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"month": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"count": {
+					"type": "integer",
+					"originalType": "Int",
+					"default": 0
+				},
+				"createdAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"account": {
+					"$ref": "#/definitions/Account"
+				},
+				"api": {
+					"$ref": "#/definitions/Api"
+				}
+			},
+			"required": ["apiId", "accountId", "month"]
+		},
+		"Api": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"name": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"description": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"version": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"context": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"visibility": {
+					"type": "string",
+					"originalType": "String",
+					"default": "PUBLIC"
+				},
+				"isEnabled": {
+					"type": "boolean",
+					"originalType": "Boolean",
+					"default": false
+				},
+				"isProtected": {
+					"type": "boolean",
+					"originalType": "Boolean",
+					"default": false
+				},
+				"subscriptionRequired": {
+					"type": "boolean",
+					"originalType": "Boolean",
+					"default": false
+				},
+				"createdAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"apiConfigs": {
+					"type": "array",
+					"originalType": "AccountApiConfig",
+					"items": {
+						"$ref": "#/definitions/AccountApiConfig"
+					}
+				},
+				"apiUsages": {
+					"type": "array",
+					"originalType": "AccountApiUsage",
+					"items": {
+						"$ref": "#/definitions/AccountApiUsage"
+					}
+				}
+			},
+			"required": ["name", "description", "version", "context"]
+		},
+		"Application": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"accountId": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"name": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"status": {
+					"type": "string",
+					"originalType": "applicationstatus",
+					"default": "ACTIVE",
+					"enum": ["ACTIVE", "INACTIVE", "DELETED"]
+				},
+				"deletedBy": {
+					"type": ["string", "null"],
+					"originalType": "applicationdeletedby",
+					"enum": ["USER", "SYSTEM", "ADMIN"]
+				},
+				"deletedById": {
+					"type": ["string", "null"],
+					"originalType": "String"
+				},
+				"createdAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"deletedAt": {
+					"type": ["string", "null"],
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"accounts": {
+					"$ref": "#/definitions/Account"
+				},
+				"client": {
+					"type": "array",
+					"originalType": "Client",
+					"items": {
+						"$ref": "#/definitions/Client"
+					}
+				}
+			},
+			"required": ["accountId", "name"]
+		},
+		"Bank": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"name": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"logoUrl": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"createdAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"bankAccounts": {
+					"type": "array",
+					"originalType": "BankAccount",
+					"items": {
+						"$ref": "#/definitions/BankAccount"
+					}
+				}
+			},
+			"required": ["name", "logoUrl"]
+		},
+		"BankAccount": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"bankId": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"accountName": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"ssn": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"balance": {
+					"type": "number",
+					"originalType": "Decimal",
+					"default": 0
+				},
+				"createdAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"lastWithdrawal": {
+					"type": ["string", "null"],
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"lastDeposit": {
+					"type": ["string", "null"],
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"bank": {
+					"$ref": "#/definitions/Bank"
+				},
+				"notifications": {
+					"type": "array",
+					"originalType": "Notification",
+					"items": {
+						"$ref": "#/definitions/Notification"
+					}
+				},
+				"receivedP2pTransfers": {
+					"type": "array",
+					"originalType": "P2pTransfer",
+					"items": {
+						"$ref": "#/definitions/P2pTransfer"
+					}
+				},
+				"sentP2pTransfers": {
+					"type": "array",
+					"originalType": "P2pTransfer",
+					"items": {
+						"$ref": "#/definitions/P2pTransfer"
+					}
+				},
+				"transactions": {
+					"type": "array",
+					"originalType": "Transaction",
+					"items": {
+						"$ref": "#/definitions/Transaction"
+					}
+				}
+			},
+			"required": ["bankId", "accountName", "ssn"]
+		},
+		"Certificate": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"accountId": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"description": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"commonName": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"serialNumber": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"status": {
+					"type": "string",
+					"originalType": "certificatestatus",
+					"default": "ISSUED",
+					"enum": ["ISSUED", "REVOKED", "EXPIRED", "DELETED"]
+				},
+				"deletedBy": {
+					"type": ["string", "null"],
+					"originalType": "certificatedeletedby",
+					"enum": ["USER", "SYSTEM", "ADMIN"]
+				},
+				"deletedById": {
+					"type": ["string", "null"],
+					"originalType": "String"
+				},
+				"expiresAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"createdAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"deletedAt": {
+					"type": ["string", "null"],
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"account": {
+					"$ref": "#/definitions/Account"
+				}
+			},
+			"required": [
+				"accountId",
+				"description",
+				"commonName",
+				"serialNumber",
+				"expiresAt"
+			]
+		},
+		"Client": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"applicationId": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"name": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"baseUrl": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"type": {
+					"type": "string",
+					"originalType": "clienttype",
+					"enum": ["PUBLIC", "CONFIDENTIAL"]
+				},
+				"secret": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"status": {
+					"type": "string",
+					"originalType": "clientstatus",
+					"default": "CREATED",
+					"enum": ["CREATED", "DISABLED", "DELETED"]
+				},
+				"deletedBy": {
+					"type": ["string", "null"],
+					"originalType": "clientdeletedby",
+					"enum": ["USER", "SYSTEM", "ADMIN"]
+				},
+				"deletedById": {
+					"type": ["string", "null"],
+					"originalType": "String"
+				},
+				"createdAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"deletedAt": {
+					"type": ["string", "null"],
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"application": {
+					"$ref": "#/definitions/Application"
+				}
+			},
+			"required": ["applicationId", "name", "baseUrl", "type", "secret"]
+		},
+		"CompanyDetails": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"accountId": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"details": {
+					"type": ["number", "string", "boolean", "object", "array", "null"],
+					"originalType": "Json"
+				},
+				"createdAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"account": {
+					"$ref": "#/definitions/Account"
+				}
+			},
+			"required": ["accountId", "details"]
+		},
+		"Notification": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"bankAccountId": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"message": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"details": {
+					"type": ["number", "string", "boolean", "object", "array", "null"],
+					"originalType": "Json"
+				},
+				"createdAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"bankAccount": {
+					"$ref": "#/definitions/BankAccount"
+				}
+			},
+			"required": ["bankAccountId", "message"]
+		},
+		"P2pTransfer": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"senderBankAccountId": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"receiverBankAccountId": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"amount": {
+					"type": "number",
+					"originalType": "Decimal"
+				},
+				"initiatedDate": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"completedDate": {
+					"type": ["string", "null"],
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"status": {
+					"type": "string",
+					"originalType": "p2ptransferstatus",
+					"enum": ["PENDING", "COMPLETED", "FAILED"]
+				},
+				"reason": {
+					"type": ["string", "null"],
+					"originalType": "String"
+				},
+				"type": {
+					"type": "string",
+					"originalType": "p2ptransfertype",
+					"enum": ["PAYMENT", "REFUND", "REVERSAL"]
+				},
+				"createdAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"recieverBankAccount": {
+					"$ref": "#/definitions/BankAccount"
+				},
+				"senderBankAccount": {
+					"$ref": "#/definitions/BankAccount"
+				}
+			},
+			"required": [
+				"senderBankAccountId",
+				"receiverBankAccountId",
+				"amount",
+				"initiatedDate",
+				"status",
+				"type"
+			]
+		},
+		"Transaction": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"bankAccountId": {
+					"type": "string",
+					"originalType": "String"
+				},
+				"amount": {
+					"type": "number",
+					"originalType": "Decimal",
+					"default": 0
+				},
+				"isWithdrawal": {
+					"type": "boolean",
+					"originalType": "Boolean",
+					"default": false
+				},
+				"isDeposit": {
+					"type": "boolean",
+					"originalType": "Boolean",
+					"default": false
+				},
+				"status": {
+					"type": "string",
+					"originalType": "transactionstatus",
+					"default": "PENDING",
+					"enum": ["PENDING", "SUCCESS", "FAILED"]
+				},
+				"createdAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"originalType": "DateTime",
+					"format": "date-time"
+				},
+				"bankAccount": {
+					"$ref": "#/definitions/BankAccount"
+				}
+			},
+			"required": ["bankAccountId"]
+		}
+	},
+	"type": "object",
+	"properties": {
+		"account": {
+			"$ref": "#/definitions/Account"
+		},
+		"accountApiConfig": {
+			"$ref": "#/definitions/AccountApiConfig"
+		},
+		"accountApiUsage": {
+			"$ref": "#/definitions/AccountApiUsage"
+		},
+		"api": {
+			"$ref": "#/definitions/Api"
+		},
+		"application": {
+			"$ref": "#/definitions/Application"
+		},
+		"bank": {
+			"$ref": "#/definitions/Bank"
+		},
+		"bankAccount": {
+			"$ref": "#/definitions/BankAccount"
+		},
+		"certificate": {
+			"$ref": "#/definitions/Certificate"
+		},
+		"client": {
+			"$ref": "#/definitions/Client"
+		},
+		"companyDetails": {
+			"$ref": "#/definitions/CompanyDetails"
+		},
+		"notification": {
+			"$ref": "#/definitions/Notification"
+		},
+		"p2pTransfer": {
+			"$ref": "#/definitions/P2pTransfer"
+		},
+		"transaction": {
+			"$ref": "#/definitions/Transaction"
+		}
+	}
+}

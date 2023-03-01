@@ -1,0 +1,106 @@
+{
+	"schema": {
+		"description": "This route will handle creating a new Account and creating a User resource in the Keycloak server. Users must then verify the email.",
+		"summary": "Signs Up a new Account.",
+		"tags": ["Authentication"],
+		"body": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["username", "email", "password", "firstName", "lastName"],
+			"properties": {
+				"username": {
+					"type": "string",
+					"pattern": "\\w+"
+				},
+				"email": {
+					"type": "string",
+					"format": "email"
+				},
+				"password": {
+					"type": "string",
+					"pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$!%*?&])[A-Za-z\\d@#$!%*?&]{8,}$",
+					"minLength": 8,
+					"maxLength": 32
+				},
+				"firstName": {
+					"type": "string",
+					"pattern": "\\w+"
+				},
+				"lastName": {
+					"type": "string",
+					"pattern": "\\w+"
+				}
+			},
+			"errorMessage": {
+				"type": "invalid payload: not in the desired format",
+				"required": {
+					"username": "username is a required property",
+					"email": "email is a required property",
+					"password": "password is a required property",
+					"firstName": "firstName is a required property",
+					"lastName": "lastName is a required property"
+				},
+				"properties": {
+					"username": "invalid alphanumeric",
+					"email": "invalid email",
+					"password": "invalid password",
+					"firstName": "invalid alphanumeric",
+					"lastName": "invalid alphanumeric"
+				},
+				"additionalProperties": "invalid payload: extra fields found"
+			}
+		},
+		"response": {
+			"200": {
+				"description": "Successful Sign Up Response",
+				"type": "object",
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"description": "Indicates the state of the performed operation. Could return `false` if the request succeeded, but failed while attempting to do other operations."
+					},
+					"message": {
+						"type": "string",
+						"description": "Returns some information on the state of the performed operation."
+					}
+				}
+			},
+			"4xx": {
+				"description": "Failure due to bad input or auth.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Bad Request"
+					},
+					"message": {
+						"type": "string",
+						"default": "Invalid input, auth, parameters etc."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 400
+					}
+				}
+			},
+			"5xx": {
+				"description": "Failure on the service side.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Internal Server Error"
+					},
+					"message": {
+						"type": "string",
+						"default": "Something went wrong."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 500
+					}
+				}
+			}
+		}
+	}
+}

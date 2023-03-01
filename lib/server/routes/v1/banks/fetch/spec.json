@@ -1,0 +1,97 @@
+{
+	"schema": {
+		"tags": ["Banks"],
+		"description": "This route fetches a single bank.",
+		"summary": "Fetch a single bank",
+		"params": {
+			"type": "object",
+			"additionalProperties": false,
+			"required": ["name"],
+			"properties": {
+				"name": {
+					"type": "string",
+					"pattern": "^[a-zA-Z0-9_\\-\\s]{3,}$"
+				}
+			},
+			"errorMessage": {
+				"type": "invalid payload: not in the desired format",
+				"properties": {
+					"name": "invalid format"
+				},
+				"required": {
+					"name": "name is a required property"
+				},
+				"additionalProperties": "invalid payload: extra fields found"
+			}
+		},
+		"response": {
+			"200": {
+				"description": "Successfully fetched a bank",
+				"type": "object",
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"description": "Indicates the state of the performed operation. Could return `false` if the request succeeded, but failed while attempting to do other operations."
+					},
+					"message": {
+						"type": "string",
+						"description": "Returns some information on the state of the performed operation."
+					},
+					"data": {
+						"type": "object",
+						"properties": {
+							"bank": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									},
+									"logoUrl": {
+										"type": "string",
+										"format": "uri"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"4xx": {
+				"description": "Failure due to bad input or auth.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Bad Request"
+					},
+					"message": {
+						"type": "string",
+						"default": "Invalid input, auth, parameters etc."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 400
+					}
+				}
+			},
+			"5xx": {
+				"description": "Failure on the service side.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Internal Server Error"
+					},
+					"message": {
+						"type": "string",
+						"default": "Something went wrong."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 500
+					}
+				}
+			}
+		}
+	}
+}

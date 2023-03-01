@@ -1,0 +1,171 @@
+{
+	"schema": {
+		"tags": ["Certificate"],
+		"description": "This route will list Certificates for a specific `Account` using their `ID`.",
+		"summary": "Lists Certificates using an Account's ID from an Access Token.",
+		"headers": {
+			"type": "object",
+			"required": ["authorization"],
+			"properties": {
+				"authorization": {
+					"type": "string",
+					"pattern": "^(Bearer\\s)([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_\\-\\+/=]*)"
+				}
+			},
+			"errorMessage": {
+				"required": {
+					"authorization": "'authorization' header missing"
+				},
+				"properties": {
+					"authorization": "invalid format"
+				}
+			}
+		},
+		"querystring": {
+			"type": "object",
+			"additionalProperties": false,
+			"properties": {
+				"limit": {
+					"type": "integer",
+					"minimum": 1,
+					"default": 10
+				},
+				"offset": {
+					"type": "integer",
+					"minimum": 0,
+					"default": 0
+				},
+				"field": {
+					"type": "string",
+					"enum": ["createdAt", "updatedAt", "expiresAt", "deletedAt"],
+					"default": "createdAt"
+				},
+				"direction": {
+					"type": "string",
+					"enum": ["asc", "desc"],
+					"default": "desc"
+				}
+			},
+			"errorMessage": {
+				"type": "invalid payload: not in the desired format",
+				"properties": {
+					"limit": "must be an integer more than or equal 1",
+					"offset": "must be an integer more than or equal 0",
+					"field": "must be one of the following values: createdAt, updatedAt, expiresAt, deletedAt",
+					"direction": "must be one of the following values: asc, desc"
+				},
+				"additionalProperties": "invalid payload: extra fields found"
+			}
+		},
+		"response": {
+			"200": {
+				"description": "Successful List Certificates response.",
+				"type": "object",
+				"properties": {
+					"success": {
+						"type": "boolean",
+						"description": "Indicates the state of the performed operation. Could return `false` if the request succeeded, but failed while attempting to do other operations."
+					},
+					"message": {
+						"type": "string",
+						"description": "Returns some information on the state of the performed operation."
+					},
+					"data": {
+						"type": "object",
+						"properties": {
+							"certificates": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "string",
+											"format": "uuid"
+										},
+										"accountId": {
+											"type": "string",
+											"format": "uuid"
+										},
+										"description": {
+											"type": "string"
+										},
+										"commonName": {
+											"type": "string"
+										},
+										"serialNumber": {
+											"type": "string"
+										},
+										"status": {
+											"type": "string",
+											"enum": ["ISSUED", "REVOKED", "EXPIRED", "DELETED"]
+										},
+										"deletedBy": {
+											"type": "string",
+											"enum": ["USER", "SYSTEM", "ADMIN"]
+										},
+										"deletedById": {
+											"type": "string",
+											"format": "uuid"
+										},
+										"expiresAt": {
+											"type": "string",
+											"format": "date-time"
+										},
+										"updatedAt": {
+											"type": "string",
+											"format": "date-time"
+										},
+										"createdAt": {
+											"type": "string",
+											"format": "date-time"
+										},
+										"deletedAt": {
+											"type": "string",
+											"format": "date-time"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"4xx": {
+				"description": "Failure due to bad input or auth.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Bad Request"
+					},
+					"message": {
+						"type": "string",
+						"default": "Invalid input, auth, parameters etc."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 400
+					}
+				}
+			},
+			"5xx": {
+				"description": "Failure on the service side.",
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"default": "Internal Server Error"
+					},
+					"message": {
+						"type": "string",
+						"default": "Something went wrong."
+					},
+					"statusCode": {
+						"type": "integer",
+						"default": 500
+					}
+				}
+			}
+		}
+	}
+}
