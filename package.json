@@ -48,7 +48,7 @@
 		"jwk-to-pem": "^2.0.5",
 		"jwks-rsa": "^3.0.1",
 		"make-promises-safe": "^5.1.0",
-		"openid-client": "^5.3.1",
+		"openid-client": "^5.4.0",
 		"parse-redis-url-simple": "^1.0.2",
 		"pino": "^8.8.0",
 		"pino-pretty": "^9.1.1",
