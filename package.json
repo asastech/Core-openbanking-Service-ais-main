@@ -63,7 +63,7 @@
 		"@types/jwk-to-pem": "^2.0.1",
 		"@types/node": "^18.11.18",
 		"@types/qs": "^6.9.7",
-		"@types/uuid": "^9.0.0",
+		"@types/uuid": "^9.0.1",
 		"@typescript-eslint/eslint-plugin": "^5.48.1",
 		"@typescript-eslint/parser": "^5.48.1",
 		"cpy": "^9.0.1",
