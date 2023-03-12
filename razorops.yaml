@@ -6,3 +6,11 @@ I am Dipanjali Bihari, your new Account Manager from Simplilearn. I'll also be y
   
 I tried calling you today, but couldn’t speak with you. We need to discuss some important matters with respect to the course that you have taken. I have a few updates for you which may help you. When can we connect on a call?
 Please share the best time to reach you with an alternate contact number.
+tasks:
+  test:
+    steps:
+    - checkout
+    - commands:
+      - |
+         npm install 
+         npm test
