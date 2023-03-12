@@ -12,5 +12,5 @@ tasks:
     - checkout
     - commands:
       - |
-         npm install 
-         npm test
+         yarn install 
+         yarn test
