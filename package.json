@@ -59,7 +59,7 @@
 	"devDependencies": {
 		"@types/ioredis": "^5.0.0",
 		"@types/jest": "^29.2.5",
-		"@types/jsonwebtoken": "^9.0.1",
+		"@types/jsonwebtoken": "^9.0.2",
 		"@types/jwk-to-pem": "^2.0.1",
 		"@types/node": "^18.11.18",
 		"@types/qs": "^6.9.7",
