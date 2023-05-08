@@ -61,7 +61,7 @@
 		"@types/jest": "^29.2.5",
 		"@types/jsonwebtoken": "^9.0.1",
 		"@types/jwk-to-pem": "^2.0.1",
-		"@types/node": "^18.11.18",
+		"@types/node": "^20.1.0",
 		"@types/qs": "^6.9.7",
 		"@types/uuid": "^9.0.0",
 		"@typescript-eslint/eslint-plugin": "^5.48.1",
