@@ -53,7 +53,7 @@
 		"pino": "^8.8.0",
 		"pino-pretty": "^9.1.1",
 		"prisma-json-schema-generator": "^3.1.1",
-		"qs": "^6.11.0",
+		"qs": "^6.11.2",
 		"uuid": "^9.0.0"
 	},
 	"devDependencies": {
