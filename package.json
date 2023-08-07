@@ -35,7 +35,7 @@
 		"ajv": "^8.12.0",
 		"ajv-errors": "^3.0.0",
 		"ajv-formats": "^2.1.1",
-		"argon2": "^0.30.3",
+		"argon2": "^0.31.0",
 		"axios": "^1.2.2",
 		"crypto-random-string": "<4",
 		"env-cmd": "^10.1.0",
