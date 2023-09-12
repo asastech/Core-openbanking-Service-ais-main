@@ -1,58 +1,83 @@
-FROM --platform=$BUILDPLATFORM tonistiigi/xx:1.2.1@sha256:8879a398dedf0aadaacfbd332b29ff2f84bc39ae6d4e9c0a1109db27ac5ba012 AS xx
+FROM alpine:3.18
 
-FROM --platform=$BUILDPLATFORM golang:1.20.4-alpine3.16@sha256:6469405d7297f82d56195c90a3270b0806ef4bd897aa0628477d9959ab97a577 AS builder
+# This is the release of Vault to pull in.
+ARG VAULT_VERSION=1.13.3
 
-COPY --from=xx / /
+# Create a vault user and group first so the IDs get set the same way,
+# even as the rest of this may change over time.
+RUN addgroup vault && \
+    adduser -S -G vault vault
 
-RUN apk add --update --no-cache ca-certificates make git curl clang lld
+# Set up certificates, our base tools, and Vault.
+RUN set -eux; \
+    apk add --no-cache ca-certificates gnupg openssl libcap su-exec dumb-init tzdata && \
+    apkArch="$(apk --print-arch)"; \
+    case "$apkArch" in \
+        armhf) ARCH='arm' ;; \
+        aarch64) ARCH='arm64' ;; \
+        x86_64) ARCH='amd64' ;; \
+        x86) ARCH='386' ;; \
+        *) echo >&2 "error: unsupported architecture: $apkArch"; exit 1 ;; \
+    esac && \
+    VAULT_GPGKEY=C874011F0AB405110D02105534365D9472D7468F; \
+    found=''; \
+    for server in \
+        hkps://keys.openpgp.org \
+        hkps://keyserver.ubuntu.com \
+        hkps://pgp.mit.edu \
+    ; do \
+        echo "Fetching GPG key $VAULT_GPGKEY from $server"; \
+        gpg --batch --keyserver "$server" --recv-keys "$VAULT_GPGKEY" && found=yes && break; \
+    done; \
+    test -z "$found" && echo >&2 "error: failed to fetch GPG key $VAULT_GPGKEY" && exit 1; \
+    mkdir -p /tmp/build && \
+    cd /tmp/build && \
+    wget https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_${ARCH}.zip && \
+    wget https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_SHA256SUMS && \
+    wget https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_SHA256SUMS.sig && \
+    gpg --batch --verify vault_${VAULT_VERSION}_SHA256SUMS.sig vault_${VAULT_VERSION}_SHA256SUMS && \
+    grep vault_${VAULT_VERSION}_linux_${ARCH}.zip vault_${VAULT_VERSION}_SHA256SUMS | sha256sum -c && \
+    unzip -d /tmp/build vault_${VAULT_VERSION}_linux_${ARCH}.zip && \
+    cp /tmp/build/vault /bin/vault && \
+    if [ -f /tmp/build/EULA.txt ]; then mkdir -p /usr/share/doc/vault; mv /tmp/build/EULA.txt /usr/share/doc/vault/EULA.txt; fi && \
+    if [ -f /tmp/build/TermsOfEvaluation.txt ]; then mkdir -p /usr/share/doc/vault; mv /tmp/build/TermsOfEvaluation.txt /usr/share/doc/vault/TermsOfEvaluation.txt; fi && \
+    cd /tmp && \
+    rm -rf /tmp/build && \
+    gpgconf --kill dirmngr && \
+    gpgconf --kill gpg-agent && \
+    apk del gnupg openssl && \
+    rm -rf /root/.gnupg
 
-ARG TARGETPLATFORM
+# /vault/logs is made available to use as a location to store audit logs, if
+# desired; /vault/file is made available to use as a location with the file
+# storage backend, if desired; the server will be started with /vault/config as
+# the configuration directory so you can add additional config files in that
+# location.
+RUN mkdir -p /vault/logs && \
+    mkdir -p /vault/file && \
+    mkdir -p /vault/config && \
+    chown -R vault:vault /vault
 
-RUN xx-apk --update --no-cache add musl-dev gcc
+# Expose the logs directory as a volume since there's potentially long-running
+# state in there
+VOLUME /vault/logs
 
-RUN xx-go --wrap
+# Expose the file directory as a volume since there's potentially long-running
+# state in there
+VOLUME /vault/file
 
-WORKDIR /usr/local/src/bank-vaults
+# 8200/tcp is the primary interface that applications use to interact with
+# Vault.
+EXPOSE 8200
 
-ARG GOPROXY
+# The entry point script uses dumb-init as the top-level process to reap any
+# zombie processes created by Vault sub-processes.
+#
+# For production derivatives of this container, you shoud add the IPC_LOCK
+# capability so that Vault can mlock memory.
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
 
-ENV CGO_ENABLED=1
-
-COPY go.* ./
-RUN go mod download
-
-COPY . .
-
-RUN go build -o /usr/local/bin/bank-vaults ./cmd/bank-vaults/
-RUN xx-verify /usr/local/bin/bank-vaults
-
-RUN go build -o /usr/local/bin/template ./cmd/template/
-RUN xx-verify /usr/local/bin/template
-
-FROM alpine:3.18.3@sha256:7144f7bab3d4c2648d7e59409f15ec52a18006a128c733fcff20d3a4a54ba44a AS common
-
-RUN apk add --update --no-cache ca-certificates tzdata
-
-# Install tools for accessing smart cards
-RUN apk add --no-cache ccid opensc pcsc-lite-libs
-
-COPY --from=builder /usr/local/bin/bank-vaults /usr/local/bin/bank-vaults
-COPY --from=builder /usr/local/bin/template /usr/local/bin/template
-COPY --from=builder /usr/local/src/bank-vaults/scripts/pcscd-entrypoint.sh /usr/local/bin/pcscd-entrypoint.sh
-
-ENTRYPOINT ["bank-vaults"]
-
-FROM common AS softhsm
-
-RUN apk add --no-cache softhsm
-
-USER 65534
-
-# Initializing SoftHSM to be able to create a working example (only for dev),
-# sharing the HSM device is emulated with a pre-created keypair in the image.
-RUN softhsm2-util --init-token --free --label bank-vaults --so-pin bank-vaults --pin bank-vaults
-RUN pkcs11-tool --module /usr/lib/softhsm/libsofthsm2.so --keypairgen --key-type rsa:2048 --pin bank-vaults --token-label bank-vaults --label bank-vaults
-
-FROM common
-
-USER 65534
+# By default you'll get a single-node development server that stores everything
+# in RAM and bootstraps itself. Don't use this configuration for production.
+CMD ["server", "-dev"]
