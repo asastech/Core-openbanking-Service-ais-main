@@ -1,23 +1,33 @@
-FROM alpine:3.16
+# base image
+FROM alpine:3.14
 
-RUN apk --update --no-cache add vault curl tini libcap bash openssl net-tools ca-certificates
+# set vault version
+ENV VAULT_VERSION 1.8.2
 
-RUN rm -rf /var/cache/apk/*
+# create a new directory
+RUN mkdir /vault
 
-ENV UID=10001
+# download dependencies
+RUN apk --no-cache add \
+      bash \
+      ca-certificates \
+      wget \
+      curl
 
-RUN addgroup -S vault-service
+# download and set up vault
+RUN wget --quiet --output-document=/tmp/vault.zip https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip && \
+    unzip /tmp/vault.zip -d /vault && \
+    rm -f /tmp/vault.zip && \
+    chmod +x /vault
 
-RUN adduser -D \
-	--disabled-password \ 
-	--uid "${UID}" \
-	vault-user \
-	-G vault-service
+# update PATH
+ENV PATH="PATH=$PATH:$PWD/vault"
 
-RUN	setcap cap_ipc_lock=+ep "$(readlink -f /usr/sbin/vault)"
+# add the config file
+COPY ./config/vault-config.json /vault/config/vault-config.json
 
-USER vault-user
+# expose port 8200
+EXPOSE 8200
 
-VOLUME ["/vault/ssl", "/vault/config", "/vault/audit", "/vault/data"]
-
-ENTRYPOINT ["/sbin/tini", "--", "vault"]
+# run vault
+ENTRYPOINT ["vault"]
