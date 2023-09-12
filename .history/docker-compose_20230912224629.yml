@@ -76,10 +76,12 @@ services:
     expose:
       - 6379
     restart: unless-stopped
+    
+  services:
   vault-filesystem:
       image: erangaeb/vault-filesystem:0.1
       ports:
-        - 8200:8200
+      - 8200:8200
       environment:
         - VAULT_ADDR=http://127.0.0.1:8200
         - VAULT_API_ADDR=http://127.0.0.1:8200

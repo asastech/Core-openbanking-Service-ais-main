@@ -76,13 +76,27 @@ services:
     expose:
       - 6379
     restart: unless-stopped
-  vault-filesystem:
-      image: erangaeb/vault-filesystem:0.1
-      ports:
-        - 8200:8200
-      environment:
-        - VAULT_ADDR=http://127.0.0.1:8200
-        - VAULT_API_ADDR=http://127.0.0.1:8200
-      command: server -config=/vault/config/vault-config.json
-      cap_add:
-        - IPC_LOCK
+  vault:
+    build:
+      context: ./vault
+    command: server -dev -dev-root-token-id $VAULT_TOKEN -dev-listen-address "0.0.0.0:8200"
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'curl',
+          '-skXGET',
+          'http://localhost:8200/v1/sys/health?standbyok=true',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+    ports:
+      - 8200:8200
+    expose:
+      - 8200
+    environment:
+      VAULT_TOKEN: super_secret_vault_token
+    cap_add:
+      - IPC_LOCK

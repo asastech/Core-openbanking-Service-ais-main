@@ -76,7 +76,8 @@ services:
     expose:
       - 6379
     restart: unless-stopped
-  vault-filesystem:
+  vault:
+    build:
       image: erangaeb/vault-filesystem:0.1
       ports:
         - 8200:8200
