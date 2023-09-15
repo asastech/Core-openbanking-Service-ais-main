@@ -26,7 +26,7 @@ services:
       - 5432
     restart: unless-stopped
   db-migrator:
-    image: ghcr.io/asastech/db-migrator-main:main
+    image: drop149/db-migrator-main-db-migrator:latest
     command: migrate -i -d api
     environment:
       FLYWAY_URL: jdbc:postgresql://db:5432/api
