@@ -26,7 +26,7 @@ services:
       - 5432
     restart: unless-stopped
   db-migrator:
-    image: drop149/testasas:latest
+    image: drop149/asasdb:latest
     command: migrate -i -d api
     environment:
       FLYWAY_URL: jdbc:postgresql://db:5432/api
@@ -76,27 +76,27 @@ services:
     expose:
       - 6379
     restart: unless-stopped
-  vault:
-    build:
-      context: ./vault
-    command: server -dev -dev-root-token-id $VAULT_TOKEN -dev-listen-address "0.0.0.0:8200"
-    healthcheck:
-      test:
-        [
-          'CMD',
-          'curl',
-          '-skXGET',
-          'http://localhost:8200/v1/sys/health?standbyok=true',
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 40s
-    ports:
-      - 8200:8200
-    expose:
-      - 8200
-    environment:
-      VAULT_TOKEN: super_secret_vault_token
-    cap_add:
-      - IPC_LOCK
+  # vault:
+  #   build:
+  #     context: ./vault
+  #   command: server -dev -dev-root-token-id $VAULT_TOKEN -dev-listen-address "0.0.0.0:8200"
+  #   healthcheck:
+  #     test:
+  #       [
+  #         'CMD',
+  #         'curl',
+  #         '-skXGET',
+  #         'http://localhost:8200/v1/sys/health?standbyok=true',
+  #       ]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+  #     start_period: 40s
+  #   ports:
+  #     - 8200:8200
+  #   expose:
+  #     - 8200
+  #   environment:
+  #     VAULT_TOKEN: super_secret_vault_token
+  #   cap_add:
+  #     - IPC_LOCK
