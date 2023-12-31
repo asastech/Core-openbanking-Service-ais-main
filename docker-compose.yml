@@ -26,7 +26,7 @@ services:
       - 5432
     restart: unless-stopped
   db-migrator:
-    image: drop149/asasdb:latest
+    image: asastech/db-migrator-test:latest
     command: migrate -i -d api
     environment:
       FLYWAY_URL: jdbc:postgresql://db:5432/api
@@ -36,7 +36,7 @@ services:
       - db
     links:
       - db
-    restart: always
+    restart: unless-stopped
   keycloak:
     build:
       context: ./keycloak
@@ -55,12 +55,9 @@ services:
       DB_DATABASE: keycloak
       DB_USER: keycloak
       DB_SCHEMA: public
-      DB_PASSWORD: password
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
       KC_HEALTH_ENABLED: 'true'
       KC_METRICS_ENABLED: 'true'
-      KC_FEATURES_DISABLED: preview,web-authn,docker,openshift-integration
+      KC_FEATURES_DISABLED: preview,web-authn,docker,
     ports:
       - 8080:8080
     expose:
@@ -76,6 +73,101 @@ services:
     expose:
       - 6379
     restart: unless-stopped
+
+  vault:
+      image: hashicorp/vault:latest
+      volumes:
+        - ./vault/config:/vault/config
+        - ./vault/policies:/vault/policies
+        - ./vault/data:/vault/data
+      ports:
+        - 8200:8200
+      environment:
+        - VAULT_ADDR=http://localhost:8200
+        - VAULT_API_ADDR=http://localhost:8200
+        - VAULT_ADDRESS=http://localhost:8200
+      cap_add:
+        - IPC_LOCK
+      command: vault server -config=/vault/config/vault.json
+
+# version: '3.9'
+
+# services:
+#   kc-db:
+#     image: postgres:15-alpine
+#     command: postgres -c fsync=off -c synchronous_commit=off -c full_page_writes=off -c random_page_cost=1.0
+#     environment:
+#       POSTGRES_DB: keycloak
+#       POSTGRES_USER: keycloak
+#       POSTGRES_PASSWORD: password
+#       PGDATA: /var/lib/postgresql/data
+#     tmpfs: /var/lib/postgresql/data
+#     restart: unless-stopped
+#   db:
+#     image: postgres:15-alpine
+#     command: postgres -c fsync=off -c synchronous_commit=off -c full_page_writes=off -c random_page_cost=1.0
+#     environment:
+#       POSTGRES_DB: api
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: password123
+#       PGDATA: /var/lib/postgresql/data
+#     tmpfs: /var/lib/postgresql/data
+#     ports:
+#       - 5432:5432
+#     expose:
+#       - 5432
+#     restart: unless-stopped
+#   db-migrator:
+#     image: drop149/asasdb:latest
+#     command: migrate -i -d api
+#     environment:
+#       FLYWAY_URL: jdbc:postgresql://db:5432/api
+#       FLYWAY_USER: postgres
+#       FLYWAY_PASSWORD: password123
+#     depends_on:
+#       - db
+#     links:
+#       - db
+#     restart: always
+#   keycloak:
+#     build:
+#       context: ./keycloak
+#       args:
+#         - KC_DATA=default.json
+#     command: start-dev
+#     healthcheck:
+#       test: ['CMD', 'curl', '-skXGET', 'http://localhost:8080/health']
+#       interval: 1m30s
+#       timeout: 10s
+#       retries: 3
+#       start_period: 40s
+#     environment:
+#       DB_VENDOR: POSTGRES
+#       DB_ADDR: kc-db
+#       DB_DATABASE: keycloak
+#       DB_USER: keycloak
+#       DB_SCHEMA: public
+#       DB_PASSWORD: password
+#       KEYCLOAK_ADMIN: admin
+#       KEYCLOAK_ADMIN_PASSWORD: admin
+#       KC_HEALTH_ENABLED: 'true'
+#       KC_METRICS_ENABLED: 'true'
+#       KC_FEATURES_DISABLED: preview,web-authn,docker,openshift-integration
+#     ports:
+#       - 8080:8080
+#     expose:
+#       - 8080
+#     links:
+#       - kc-db
+#     depends_on:
+#       - kc-db
+#   cache:
+#     image: redis:alpine
+#     ports:
+#       - 6379:6379
+#     expose:
+#       - 6379
+#     restart: unless-stopped
   # vault:
   #   build:
   #     context: ./vault
