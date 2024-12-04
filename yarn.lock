@@ -967,10 +967,10 @@
   resolved "https://registry.yarnpkg.com/@prisma/engines/-/engines-4.3.1.tgz#fb0ad69eded13827fb4cd81995a351c234e8327f"
   integrity sha512-4JF/uMaEDAPdcdZNOrnzE3BvrbGpjgV0FcPT3EVoi6I86fWkloqqxBt+KcK/+fIRR0Pxj66uGR9wVH8U1Y13JA==
 
-"@prisma/engines@4.8.1":
-  version "4.8.1"
-  resolved "https://registry.yarnpkg.com/@prisma/engines/-/engines-4.8.1.tgz#8428f7dcd7912c6073024511376595017630dc85"
-  integrity sha512-93tctjNXcIS+i/e552IO6tqw17sX8liivv8WX9lDMCpEEe3ci+nT9F+1oHtAafqruXLepKF80i/D20Mm+ESlOw==
+"@prisma/engines@5.2.0":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@prisma/engines/-/engines-5.2.0.tgz#e5dff48eb324c8137393933292d44ea5c3bc2ce7"
+  integrity sha512-dT7FOLUCdZmq+AunLqB1Iz+ZH/IIS1Fz2THmKZQ6aFONrQD/BQ5ecJ7g2wGS2OgyUFf4OaLam6/bxmgdOBDqig==
 
 "@prisma/fetch-engine@4.3.1":
   version "4.3.1"
@@ -4887,12 +4887,12 @@ prisma-json-schema-generator@^3.1.1:
     "@prisma/generator-helper" "4.3.1"
     "@prisma/internals" "4.3.1"
 
-prisma@^4.8.1:
-  version "4.8.1"
-  resolved "https://registry.yarnpkg.com/prisma/-/prisma-4.8.1.tgz#ef93cd908809b7d02e9f4bead5eea7733ba50c68"
-  integrity sha512-ZMLnSjwulIeYfaU1O6/LF6PEJzxN5par5weykxMykS9Z6ara/j76JH3Yo2AH3bgJbPN4Z6NeCK9s5fDkzf33cg==
+prisma@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/prisma/-/prisma-5.2.0.tgz#a302dc2635cdec1d22d552ece837fb29a03563b9"
+  integrity sha512-FfFlpjVCkZwrqxDnP4smlNYSH1so+CbfjgdpioFzGGqlQAEm6VHAYSzV7jJgC3ebtY9dNOhDMS2+4/1DDSM7bQ==
   dependencies:
-    "@prisma/engines" "4.8.1"
+    "@prisma/engines" "5.2.0"
 
 process-nextick-args@~2.0.0:
   version "2.0.1"
