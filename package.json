@@ -51,7 +51,7 @@
 		"openid-client": "^5.3.1",
 		"parse-redis-url-simple": "^1.0.2",
 		"pino": "^8.8.0",
-		"pino-pretty": "^9.1.1",
+		"pino-pretty": "^10.2.0",
 		"prisma-json-schema-generator": "^3.1.1",
 		"qs": "^6.11.0",
 		"uuid": "^9.0.0"
